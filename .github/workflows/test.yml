@@ -1,0 +1,59 @@
+name: Build and Test Deb package
+
+on:
+  push:
+    branches: [ main ]
+  schedule:
+    - cron: '0 0 * * *'
+
+env:
+  RAVENDB_VERSION: 5.4.101
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        DISTRO_VERSION_NAME: ["bionic", "focal", "jammy"]
+        SERVER_VERSION: ["5.4"]
+  
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Import env vars
+      run: ./build-deb_ubuntu-${{ matrix.DISTRO_VERSION_NAME }}_amd64.sh
+
+    - name: Build Docker Image
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        file: ubuntu_amd64.Dockerfile
+        build-args: |
+          DISTRO_VERSION_NAME=${{ matrix.DISTRO_VERSION_NAME }}
+          DISTRO_VERSION=${{ env.DISTRO_VERSION }}
+          QEMU_ARCH=${{ env.QEMU_ARCH }}
+        platforms: ${{ env.DOCKER_BUILDPLATFORM }}
+        push: false
+        tags: ravendb-deb_ubuntu_${{ env.DEB_ARCHITECTURE }}
+
+    - name: Run Docker Container
+      uses: addnab/docker-run-action@v3
+      with:
+        image: ravendb-deb_ubuntu_${{ env.DEB_ARCHITECTURE }}
+        options: |
+          --platform ${{ env.DOCKER_BUILDPLATFORM }}
+          -v ${{ env.OUTPUT_DIR }}:/dist
+          -v ${{ env.TEMP_DIR }}:/cache
+          -e RAVENDB_VERSION=${{ matrix.SERVER_VERSION }}
+          -e DOTNET_RUNTIME_VERSION=${{ env.DOTNET_RUNTIME_VERSION }}
+          -e DOTNET_DEPS_VERSION=${{ env.DOTNET_DEPS_VERSION }}
+          -e DISTRO_VERSION_NAME=${{ matrix.DISTRO_VERSION_NAME }}
+          -e DISTRO_VERSION=${{ env.DISTRO_VERSION }}
+          -e RAVEN_PLATFORM=${{ env.RAVEN_PLATFORM }}
+          -e QEMU_ARCH=${{ env.QEMU_ARCH }}
+        run: bash /build/build.sh
+
+    - name: Run package tests
+      run: ./test.sh
