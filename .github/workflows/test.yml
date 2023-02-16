@@ -18,6 +18,11 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
+    
+    - name: Checkout ravendb repository
+      run: |
+        git clone https://github.com/ravendb/ravendb.git
+        cp -rv ravendb/scripts/linux/pkg/deb/assets ./assets
 
     - name: Import env vars
       run: ./build-deb_ubuntu-${{ matrix.DISTRO_VERSION_NAME }}_amd64.sh
@@ -49,6 +54,7 @@ jobs:
           -e DOTNET_RUNTIME_VERSION=${{ env.DOTNET_RUNTIME_VERSION }}
           -e DOTNET_DEPS_VERSION=${{ env.DOTNET_DEPS_VERSION }}
           -e DISTRO_VERSION_NAME=${{ matrix.DISTRO_VERSION_NAME }}
+          -e DOWNLOAD_URL=${{ env.DOWNLOAD_URL }}
           -e DISTRO_VERSION=${{ env.DISTRO_VERSION }}
           -e RAVEN_PLATFORM=${{ env.RAVEN_PLATFORM }}
           -e QEMU_ARCH=${{ env.QEMU_ARCH }}

@@ -1,6 +1,5 @@
 #!/bin/bash -ex
 
-source $GITHUB_ENV
 scriptRoot=$(dirname $0)
 
 if [ -z "$OUTPUT_DIR" ]; then
@@ -12,6 +11,7 @@ if [ -z "$TEMP_DIR" ]; then
   echo "TEMP_DIR=$(pwd)/temp" >>  $GITHUB_ENV
 fi
 
+source $GITHUB_ENV
 
 required=( DISTRO_NAME DISTRO_VERSION DISTRO_VERSION_NAME RAVENDB_VERSION RAVEN_PLATFORM DOCKER_BUILDPLATFORM )
 
@@ -37,7 +37,8 @@ else
     DOCKER_FILE="./ubuntu_multiarch.Dockerfile"
 fi
 
-echo "DEB_BUILD_ENV_IMAGE=ravendb-deb_ubuntu_$DEB_ARCHITECTURE" >>  $GITHUB_ENV
+echo "DEB_BUILD_ENV_IMAGE=ravendb-deb_ubuntu_$DEB_ARCHITECTURE" >> $GITHUB_ENV
+echo "DOWNLOAD_URL=https://hibernatingrhinos.com/downloads/RavenDB%20for%20Linux%20x64/latest?buildType=nightly&version=${RAVENDB_VERSION}" >> $GITHUB_ENV
 
 #docker build \
 #    --platform $DOCKER_BUILDPLATFORM \
