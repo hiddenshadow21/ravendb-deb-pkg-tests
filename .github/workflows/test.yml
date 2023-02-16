@@ -66,5 +66,5 @@ jobs:
     - name: Upload packages as artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: packages
-        path: dist/**/*.deb
+        name: package-${{ env.DISTRO_VERSION }}
+        path: dist/${{ env.DISTRO_VERSION }}/*.deb
