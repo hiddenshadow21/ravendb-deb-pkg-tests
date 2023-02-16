@@ -6,9 +6,6 @@ on:
   schedule:
     - cron: '0 0 * * *'
 
-env:
-  RAVENDB_VERSION: 5.4.101
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -24,6 +21,8 @@ jobs:
 
     - name: Import env vars
       run: ./build-deb_ubuntu-${{ matrix.DISTRO_VERSION_NAME }}_amd64.sh
+      env:
+        RAVENDB_VERSION: ${{ matrix.SERVER_VERSION }}
 
     - name: Build Docker Image
       uses: docker/build-push-action@v2
