@@ -62,3 +62,9 @@ jobs:
 
     - name: Run package tests
       run: ./test.sh
+
+    - name: Upload packages as artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: packages
+        path: dist/**/*.deb
