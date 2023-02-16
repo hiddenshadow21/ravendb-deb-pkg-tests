@@ -17,7 +17,7 @@ jobs:
   
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     
     - name: Checkout ravendb repository
       run: |
@@ -30,7 +30,7 @@ jobs:
         RAVENDB_VERSION: ${{ matrix.SERVER_VERSION }}
 
     - name: Build Docker Image
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@v4
       with:
         context: .
         file: ubuntu_amd64.Dockerfile
